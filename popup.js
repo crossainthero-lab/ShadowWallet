@@ -122,7 +122,7 @@ function createAddress() {
 
 function createDefaultWallet() {
   const address = createAddress();
-  return {
+  const wallet = {
     accounts: [
       {
         id: `acct-${randomString(8)}`,
@@ -138,6 +138,8 @@ function createDefaultWallet() {
     currentAccountId: null,
     lastSynced: null
   };
+  wallet.currentAccountId = wallet.accounts[0].id;
+  return wallet;
 }
 
 function migrateWalletShape(rawWallet) {
