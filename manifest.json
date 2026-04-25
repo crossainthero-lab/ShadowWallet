@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Shadow",
+  "version": "1.0.0",
+  "description": "A sleek wallet for Solana and multi-chain assets.",
+  "permissions": ["storage", "sidePanel"],
+  "host_permissions": ["https://api.coingecko.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Shadow"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  }
+}

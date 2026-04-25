@@ -1,0 +1,9 @@
+{
+  "name": "shadow-wallet-extension",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Shadow wallet Chrome extension",
+  "scripts": {
+    "check": "powershell -NoProfile -Command \"Get-Content manifest.json | Out-Null; Get-Content popup.html | Out-Null; Get-Content popup.css | Out-Null; Get-Content popup.js | Out-Null\""
+  }
+}

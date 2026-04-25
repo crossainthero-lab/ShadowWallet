@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shadow</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="ambient ambient-a"></div>
+      <div class="ambient ambient-b"></div>
+
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">
+            <span></span>
+          </div>
+          <div>
+            <div class="brand-name">Shadow</div>
+            <button class="account-switcher" id="accountSwitcherButton" type="button">
+              <span id="accountEmoji">🌘</span>
+              <span id="accountName">Account 1</span>
+              <svg viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="ghost-icon" id="refreshPricesButton" title="Refresh prices" aria-label="Refresh prices">
+            <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/></svg>
+          </button>
+          <button class="ghost-icon" id="settingsButton" title="Settings" aria-label="Settings">
+            <svg viewBox="0 0 24 24"><path d="M12 3v2.5"></path><path d="M12 18.5V21"></path><path d="m4.93 4.93 1.77 1.77"></path><path d="m17.3 17.3 1.77 1.77"></path><path d="M3 12h2.5"></path><path d="M18.5 12H21"></path><path d="m4.93 19.07 1.77-1.77"></path><path d="m17.3 6.7 1.77-1.77"></path><circle cx="12" cy="12" r="4"></circle></svg>
+          </button>
+          <button class="ghost-icon" id="copyAddressButton" title="Copy wallet address" aria-label="Copy wallet address">
+            <svg viewBox="0 0 24 24"><path d="M9 9h10v10H9z"/><path d="M5 15H4V5h10v1"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="screen">
+        <section class="hero">
+          <div class="hero-eyebrow">
+            <span class="status-dot"></span>
+            <span id="syncLabel">Synced just now</span>
+          </div>
+          <div class="balance" id="totalBalance">$0.00</div>
+          <div class="balance-row">
+            <span class="balance-change positive" id="totalChangeUsd">$0.00</span>
+            <span class="change-pill positive" id="totalChangePct">0.00%</span>
+          </div>
+        </section>
+
+        <section class="actions">
+          <button class="action-card" data-modal="send">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24"><path d="M4 12h13"></path><path d="m12 5 7 7-7 7"></path><path d="M4 7v10"></path></svg>
+            </span>
+            <span>Send</span>
+          </button>
+          <button class="action-card" data-modal="swap">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24"><path d="M7 7h10"></path><path d="m14 4 3 3-3 3"></path><path d="M17 17H7"></path><path d="m10 14-3 3 3 3"></path><circle cx="12" cy="12" r="9"></circle></svg>
+            </span>
+            <span>Swap</span>
+          </button>
+          <button class="action-card" data-modal="receive">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 4v13"></path><path d="m6 11 6 6 6-6"></path><rect x="5" y="18" width="14" height="2.5" rx="1.25"></rect></svg>
+            </span>
+            <span>Receive</span>
+          </button>
+          <button class="action-card" data-modal="buy">
+            <span class="action-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 3v18"></path><path d="M8 7h6a3 3 0 0 1 0 6H10a3 3 0 0 0 0 6h6"></path><path d="M7 7h1"></path><path d="M16 17h1"></path></svg>
+            </span>
+            <span>Buy</span>
+          </button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h1>Assets</h1>
+              <p id="assetsSubtitle">0 holdings</p>
+            </div>
+            <button class="ghost-icon subtle" id="openMarketsButton" title="Market list" aria-label="Open market list">
+              <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+            </button>
+          </div>
+          <div class="token-list" id="tokenList"></div>
+        </section>
+
+        <section class="panel activity-panel">
+          <div class="panel-header">
+            <div>
+              <h1>Activity</h1>
+              <p>Recent wallet actions</p>
+            </div>
+          </div>
+          <div class="activity-list" id="activityList"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-root hidden" id="modalRoot">
+      <div class="backdrop" id="modalBackdrop"></div>
+      <section class="sheet" id="modalSheet">
+        <div class="sheet-head">
+          <button class="ghost-icon hidden" id="buyBackButton" aria-label="Go back">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div>
+            <h2 id="modalTitle"></h2>
+            <p id="modalSubtitle"></p>
+          </div>
+          <button class="ghost-icon" id="closeModalButton" aria-label="Close">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+
+        <div class="sheet-body">
+          <div class="account-view hidden" id="accountView">
+            <div class="account-list" id="accountList"></div>
+            <form class="create-account-card" id="createAccountForm">
+              <div class="section-label">Create account</div>
+              <label class="flow-label">
+                <span>Name</span>
+                <div class="field-shell">
+                  <input id="accountNameInput" maxlength="24" placeholder="Weekend Wallet" />
+                </div>
+              </label>
+              <label class="flow-label">
+                <span>Emoji</span>
+                <div class="field-shell">
+                  <input id="accountEmojiInput" maxlength="2" placeholder="🌙" />
+                </div>
+              </label>
+              <button class="primary-button" type="submit">Create account</button>
+            </form>
+          </div>
+
+          <div class="settings-view hidden" id="settingsView">
+            <div class="create-account-card">
+              <div class="section-label">Reset wallet</div>
+              <div class="market-meta">Wipe every account, balance, activity item, and saved address, then create a fresh default account.</div>
+              <button class="primary-button danger" id="wipeAccountsButton" type="button">Wipe all accounts</button>
+            </div>
+          </div>
+
+          <div class="buy-flow hidden" id="buyFlow">
+            <section class="buy-picker-view" id="buyPickerView">
+              <label class="search-shell">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
+                <input id="buySearchInput" placeholder="Search assets" />
+              </label>
+
+              <div class="buy-section">
+                <div class="section-label">Get started</div>
+                <div class="featured-grid" id="featuredTokenGrid"></div>
+              </div>
+
+              <div class="buy-section">
+                <div class="section-label">Popular tokens</div>
+                <div class="market-list" id="buyTokenList"></div>
+              </div>
+            </section>
+
+            <form class="buy-detail-view hidden" id="buyDetailForm">
+              <div class="buy-token-hero" id="buyTokenHero"></div>
+              <div class="account-chip" id="buyAccountChip"></div>
+              <label class="amount-shell">
+                <input id="buyAmountInput" inputmode="decimal" placeholder="0" />
+              </label>
+              <div class="unit-pill-row" id="buyUnitPills">
+                <button type="button" class="unit-pill active" data-unit="usd">USD</button>
+                <button type="button" class="unit-pill" data-unit="aud">AU$</button>
+                <button type="button" class="unit-pill" data-unit="sol">SOL</button>
+              </div>
+              <div class="buy-meta-row">
+                <span id="buyReceive">~0 ETH</span>
+                <span id="buyQuote">$0.00 / ETH</span>
+              </div>
+              <div class="quick-amounts">
+                <button type="button" class="quick-chip" data-amount="100">$100</button>
+                <button type="button" class="quick-chip" data-amount="500">$500</button>
+                <button type="button" class="quick-chip" data-amount="1000">$1K</button>
+              </div>
+              <div class="buy-actions">
+                <button type="button" class="secondary-button" id="buyCancelButton">Cancel</button>
+                <button class="primary-button" type="submit">Buy</button>
+              </div>
+            </form>
+          </div>
+
+          <form class="flow-form hidden" id="swapForm">
+            <label class="search-shell">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.35-4.35"></path></svg>
+              <input id="swapSearchInput" placeholder="Search swap targets" />
+            </label>
+            <div class="buy-section">
+              <div class="section-label">Swap from</div>
+              <div class="market-list" id="swapFromList"></div>
+            </div>
+            <div class="buy-section">
+              <div class="section-label">Swap to</div>
+              <div class="market-list" id="swapToList"></div>
+            </div>
+            <div class="flow-hero" id="swapHero"></div>
+            <div class="buy-meta-row">
+              <span id="swapFromLabel">From</span>
+              <span id="swapToLabel">To</span>
+            </div>
+            <div class="account-chip" id="swapAccountChip"></div>
+            <label class="amount-shell">
+              <input id="swapAmountInput" inputmode="decimal" placeholder="0" />
+            </label>
+            <div class="buy-meta-row">
+              <span id="swapReceiveLabel">~0</span>
+              <span id="swapAvailable">Available 0</span>
+            </div>
+            <button class="primary-button danger" type="submit">Swap asset</button>
+          </form>
+
+          <form class="flow-form hidden" id="sendForm">
+            <div class="flow-hero" id="sendHero"></div>
+            <label class="address-stack">
+              <span>Wallet address</span>
+              <div class="field-shell field-shell-inline">
+                <input id="sendAddressInput" placeholder="Enter destination address" />
+                <button class="ghost-icon" id="openAddressBookButton" type="button" aria-label="Open address book">
+                  <svg viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v12l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2Z"/><path d="M9 9h6"/><path d="M9 13h4"/></svg>
+                </button>
+              </div>
+            </label>
+            <label class="flow-label">
+              <span>Asset</span>
+              <div class="field-shell">
+                <select id="sendTokenSelect"></select>
+              </div>
+            </label>
+            <div class="account-chip" id="sendAccountChip"></div>
+            <label class="amount-shell">
+              <input id="sendAmountInput" inputmode="decimal" placeholder="0" />
+            </label>
+            <div class="buy-meta-row">
+              <span id="sendPreviewLabel">Ready to send</span>
+              <span id="sendAvailable">Available 0</span>
+            </div>
+            <button class="primary-button" type="submit">Send asset</button>
+          </form>
+
+          <div class="receive-view hidden" id="receiveView">
+            <div class="flow-hero" id="receiveHero"></div>
+            <div class="qr-shell"><div id="qrCode"></div></div>
+            <button class="address-chip" id="receiveAddressButton"></button>
+          </div>
+
+          <div class="market-view hidden" id="marketView">
+            <div class="market-list" id="marketList"></div>
+          </div>
+
+          <div class="address-book-view hidden" id="addressBookView">
+            <div class="section-label">Address book</div>
+            <div class="market-list" id="addressBookList"></div>
+          </div>
+        </div>
+
+        <div class="sheet-toast hidden" id="sheetToast"></div>
+      </section>
+    </div>
+
+    <script src="vendor/qrcode.min.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
